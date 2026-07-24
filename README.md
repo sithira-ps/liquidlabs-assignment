@@ -8,3 +8,13 @@
     ```git init```
     ```dotnet new gitignore```
 
+## Project Structure/Architecture:
+
+- Project consists of 5 main layers
+    1. Middleware
+    2. Controller
+    3. Service
+    4. Repository
+    5. Database 
+
+![alt text](architecture-diagram.png)
