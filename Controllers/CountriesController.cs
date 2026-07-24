@@ -1,3 +1,4 @@
+using System.Text.Json;
 using liquidlabs_assignment.Models;
 using liquidlabs_assignment.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Country> GetAllAsync()
+    public async Task<JsonElement> GetAllAsync()
     {
         var result = await _countriesService.GetAllAsync();
         return result;

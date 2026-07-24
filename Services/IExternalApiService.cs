@@ -3,7 +3,7 @@ using liquidlabs_assignment.Models;
 
 namespace liquidlabs_assignment.Services;
 
-public interface ICountriesService
+public interface IExternalApiService
 {
-    Task<JsonElement> GetAllAsync();
+    Task<JsonElement> GetAllFromApiAsync();
 }
