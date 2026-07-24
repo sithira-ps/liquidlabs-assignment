@@ -18,3 +18,13 @@
     5. Database 
 
 ![alt text](architecture-diagram.png)
+
+## Public API
+
+- Im using RestCountries API from https://restcountries.com/
+- The dataset covers 90+ normalized fields per country
+
+## Tasks Breakdown
+
+- Initialize the External API
+- 
