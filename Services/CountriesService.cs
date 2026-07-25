@@ -18,4 +18,16 @@ public class CountriesService : ICountriesService
         var data = await _externalApiService.GetAllFromApiAsync();
         return data;
     }
+
+    public async Task<JsonElement> GetByNameAsync()
+    {
+        var data = await _externalApiService.GetAllFromApiAsync();
+        return data;
+    }
+
+    public async Task<JsonElement> GetByContinentAsync()
+    {
+        var data = await _externalApiService.GetAllFromApiAsync();
+        return data;
+    }
 }
