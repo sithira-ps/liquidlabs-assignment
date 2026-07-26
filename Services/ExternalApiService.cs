@@ -1,7 +1,6 @@
 using System.Text.Json;
 using liquidlabs_assignment.Models;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
 
 namespace liquidlabs_assignment.Services;
 
@@ -16,11 +15,21 @@ public class ExternalApiService : IExternalApiService
         _apiConfig = apiConfig.Value;
     }
 
-    public async Task<JsonElement> GetAllFromApiAsync()
+    public async Task<JsonElement> GetAllFromApiAsync(string? name, string? continent)
     {
+        string endpoint;
+
+        if (name == null && continent == null)
+            endpoint = $"{_apiConfig.BaseUrl}/v5?limit=100";
+        else if (name != null && continent == null)
+            endpoint = $"{_apiConfig.BaseUrl}/v5/names.common/{name}";
+        else if (name == null && continent != null)
+            endpoint = $"{_apiConfig.BaseUrl}/v5/continents/{continent}";
+        else
+            throw new Exception();
+
         _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiConfig.ApiKey}");
-        Console.WriteLine(_apiConfig.ApiKey);
-        var data = await _client.GetFromJsonAsync<JsonElement>($"{_apiConfig.BaseUrl}/v5?limit=5");
+        var data = await _client.GetFromJsonAsync<JsonElement>(endpoint);
         return data;
     }
 

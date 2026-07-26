@@ -2,8 +2,9 @@ namespace liquidlabs_assignment.Models;
 
 public class Country
 {
-    public int Id { get; set; }
+    public string Uuid { get; set; } = string.Empty;
     public string Name { set; get; } = string.Empty;
-    public string Region { set; get; } = string.Empty;
+    public string Continent { set; get; } = string.Empty;
+    public SyncLevel SyncLevel { set; get; }
 
 }

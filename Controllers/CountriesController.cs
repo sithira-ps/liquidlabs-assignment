@@ -17,9 +17,23 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<JsonElement> GetAllAsync()
+    public async Task<IEnumerable<Country>> GetAllAsync()
     {
         var result = await _countriesService.GetAllAsync();
+        return result;
+    }
+
+    [HttpGet("{name}")]
+    public async Task<Country> GetByNameAsync(string name)
+    {
+        var result = await _countriesService.GetByNameAsync(name);
+        return result;
+    }
+
+    [HttpGet("continent/{continent}")]
+    public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)
+    {
+        var result = await _countriesService.GetByContinentAsync(continent);
         return result;
     }
 }

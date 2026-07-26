@@ -5,5 +5,7 @@ namespace liquidlabs_assignment.Services;
 
 public interface ICountriesService
 {
-    Task<JsonElement> GetAllAsync();
+    Task<IEnumerable<Country>> GetAllAsync();
+    Task<Country?> GetByNameAsync(string name);
+    Task<IEnumerable<Country>> GetByContinentAsync(string continent);
 }
