@@ -23,7 +23,6 @@ builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =
 
 // custom services
 builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IExternalApiService, ExternalApiService>();
 
 // repositories
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
@@ -37,8 +36,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseExceptionHandler();
+app.UseStatusCodePages(async context =>
+{
+    context.HttpContext.Response.ContentType = "application/json";
+    await context.HttpContext.Response.WriteAsJsonAsync(new ErrorResponse
+    {
+        status = "failed",
+        error = $"Endpoint Not Found ({context.HttpContext.Response.StatusCode})",
+        details = $"The route {context.HttpContext.Request.Path} doesn't exist"
+    });
+});
 app.UseHttpsRedirection();
 app.MapControllers();
 
