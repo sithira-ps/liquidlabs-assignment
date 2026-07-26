@@ -6,6 +6,6 @@ namespace liquidlabs_assignment.Services;
 public interface ICountriesService
 {
     Task<IEnumerable<Country>> GetAllAsync();
+    Task<IEnumerable<Country?>> GetByContinentAsync(string continent);
     Task<Country?> GetByNameAsync(string name);
-    Task<IEnumerable<Country>> GetByContinentAsync(string continent);
 }

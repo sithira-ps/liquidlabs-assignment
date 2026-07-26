@@ -18,17 +18,66 @@ public class CountriesService : ICountriesService
 
     public async Task<IEnumerable<Country>> GetAllAsync()
     {
-        var countries = new List<Country>();
-        var apiResponse = await _externalApiService.GetAllFromApiAsync(null, null);
-        JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects"); // countries list is under data > objects > list
-        foreach (JsonElement obj in countriesArray.EnumerateArray())
+        List<Country> countries = [];
+
+        var dbData = await _repository.GetAllAsync();
+
+        if (dbData.Count() != 0)
         {
-            countries.Add(new Country
+            return dbData;
+        }
+        else
+        {
+            var apiResponse = await _externalApiService.GetAllFromApiAsync(null, null);
+            JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects"); // countries list is under data > objects > list
+            foreach (JsonElement obj in countriesArray.EnumerateArray())
             {
-                Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
-                Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
-                Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
-            });
+                countries.Add(new Country
+                {
+                    Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
+                    Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
+                    Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
+                    SyncLevel = SyncLevel.all
+                });
+            }
+
+            await _repository.DeleteAllAsync();
+
+            await _repository.CreateBatchAsync(countries);
+        }
+
+        return countries;
+    }
+
+    public async Task<IEnumerable<Country?>> GetByContinentAsync(string continent)
+    {
+        List<Country> countries = [];
+
+        var dbData = await _repository.GetByContinentAsync(continent);
+
+        if (dbData.Count() != 0)
+        {
+            return dbData;
+        }
+        else
+        {
+            var apiResponse = await _externalApiService.GetAllFromApiAsync(name: null, continent: continent);
+            JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects"); // countries list is under data > objects > list
+            foreach (JsonElement obj in countriesArray.EnumerateArray())
+            {
+                countries.Add(new Country
+                {
+                    Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
+                    Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
+                    Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
+                    SyncLevel = SyncLevel.continent
+                });
+            }
+
+            await _repository.DeleteByContinentAsync(continent);
+
+            await _repository.CreateBatchAsync(countries);
+
         }
 
         return countries;
@@ -47,7 +96,7 @@ public class CountriesService : ICountriesService
             var apiResponse = await _externalApiService.GetAllFromApiAsync(name: name, continent: null);
             JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects")[0]; // countries list is under data > objects > list
 
-            var countries = new List<Country>();
+            List<Country> countries = [];
 
             var country = new Country
             {
@@ -63,23 +112,5 @@ public class CountriesService : ICountriesService
 
             return country;
         }
-    }
-
-    public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)
-    {
-        var countries = new List<Country>();
-        var apiResponse = await _externalApiService.GetAllFromApiAsync(name: null, continent: continent);
-        JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects"); // countries list is under data > objects > list
-        foreach (JsonElement obj in countriesArray.EnumerateArray())
-        {
-            countries.Add(new Country
-            {
-                Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
-                Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
-                Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
-            });
-        }
-
-        return countries;
     }
 }

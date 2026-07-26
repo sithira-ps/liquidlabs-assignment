@@ -19,6 +19,7 @@ public class ExternalApiService : IExternalApiService
     {
         string endpoint;
 
+        // set the endpoint based on which is searching for
         if (name == null && continent == null)
             endpoint = $"{_apiConfig.BaseUrl}/v5?limit=100";
         else if (name != null && continent == null)
