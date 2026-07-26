@@ -1,4 +1,5 @@
 using liquidlabs_assignment.Data;
+using liquidlabs_assignment.Middleware;
 using liquidlabs_assignment.Models;
 using liquidlabs_assignment.Repositories;
 using liquidlabs_assignment.Services;
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // configurations
+builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.Configure<ExternalApiConfig>(builder.Configuration.GetSection("ExternalApi"));
 builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =>
@@ -35,8 +38,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
