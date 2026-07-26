@@ -1,4 +1,6 @@
+using liquidlabs_assignment.Models;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.OpenApi.Any;
 
 namespace liquidlabs_assignment.Middleware;
 
@@ -16,9 +18,9 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json";
 
-        await context.Response.WriteAsJsonAsync(new
+        await context.Response.WriteAsJsonAsync(new ErrorResponse
         {
-            message = "An error occurred while processing the request!",
+            status = "failed",
             error = exception.Message,
             details = exception.InnerException?.Message,
         }, ct);

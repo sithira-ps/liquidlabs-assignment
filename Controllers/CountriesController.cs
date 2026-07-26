@@ -17,23 +17,36 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Country>> GetAllAsync()
+    public async Task<SuccessResponse<IEnumerable<Country>>> GetAllAsync()
     {
         var result = await _countriesService.GetAllAsync();
-        return result;
+        return new SuccessResponse<IEnumerable<Country>>
+        {
+            status = "success",
+            data = result,
+        };
     }
 
     [HttpGet("{name}")]
-    public async Task<Country> GetByNameAsync(string name)
+    public async Task<SuccessResponse<IEnumerable<Country>>> GetByNameAsync(string name)
     {
-        var result = await _countriesService.GetByNameAsync(name);
-        return result;
+        Country? result = await _countriesService.GetByNameAsync(name);
+        var response = new SuccessResponse<IEnumerable<Country>>
+        {
+            status = "success",
+            data = result != null ? [result] : [],
+        };
+        return response;
     }
 
     [HttpGet("continent/{continent}")]
-    public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)
+    public async Task<SuccessResponse<IEnumerable<Country>>> GetByContinentAsync(string continent)
     {
-        var result = await _countriesService.GetByContinentAsync(continent);
-        return result;
+        IEnumerable<Country> result = await _countriesService.GetByContinentAsync(continent);
+        return new SuccessResponse<IEnumerable<Country>>
+        {
+            status = "success",
+            data = result,
+        };
     }
 }

@@ -11,7 +11,7 @@ public class DbConnectionFactory : IDbConnectionFactory
 
     public DbConnectionFactory(IConfiguration config)
     {
-        _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new Exception();
+        _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string is not found.");
     }
 
     public DbConnection CreateConnection()

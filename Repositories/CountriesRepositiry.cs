@@ -31,9 +31,9 @@ public class CountriesRepository : ICountriesRepository
         {
             countries.Add(new Country
             {
-                Uuid = reader.GetString(reader.GetOrdinal("Id")),
-                Name = reader.GetString(reader.GetOrdinal("Name")),
-                Continent = reader.GetString(reader.GetOrdinal("Continent")),
+                Uuid = reader.GetString(reader.GetOrdinal("uuid")),
+                Name = reader.GetString(reader.GetOrdinal("name")),
+                Continent = reader.GetString(reader.GetOrdinal("continent")),
                 SyncLevel = (SyncLevel)reader.GetInt32(reader.GetOrdinal("sync_level"))
             });
         }
@@ -41,7 +41,7 @@ public class CountriesRepository : ICountriesRepository
         return countries;
     }
 
-    public async Task<IEnumerable<Country?>> GetByContinentAsync(string continent)
+    public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)
     {
         List<Country> countries = [];
         using var conn = _dbCon.CreateConnection();
