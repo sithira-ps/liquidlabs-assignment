@@ -9,4 +9,6 @@ public interface ICountriesRepository
     Task<Country?> GetByNameAsync(string name);
     // Task<IEnumerable<Country>> GetByContinentAsync(string continent);
 
+    Task<int> CreateBatchAsync(List<Country> countries);
+
 }

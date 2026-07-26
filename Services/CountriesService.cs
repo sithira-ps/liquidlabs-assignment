@@ -36,18 +36,33 @@ public class CountriesService : ICountriesService
 
     public async Task<Country?> GetByNameAsync(string name)
     {
-        var country = new Country();
-        // var dbData = await _repository.GetByNameAsync(name);
+        var dbData = await _repository.GetByNameAsync(name);
 
-        var apiResponse = await _externalApiService.GetAllFromApiAsync(name: name, continent: null);
-        JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects")[0]; // countries list is under data > objects > list
-
-        return new Country
+        if (dbData != null)
         {
-            Uuid = countriesArray.GetProperty("uuid").GetString() ?? string.Empty,
-            Name = countriesArray.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
-            Continent = countriesArray.GetProperty("continents")[0].GetString() ?? string.Empty,
-        };
+            return dbData;
+        }
+        else
+        {
+            var apiResponse = await _externalApiService.GetAllFromApiAsync(name: name, continent: null);
+            JsonElement countriesArray = apiResponse.GetProperty("data").GetProperty("objects")[0]; // countries list is under data > objects > list
+
+            var countries = new List<Country>();
+
+            var country = new Country
+            {
+                Uuid = countriesArray.GetProperty("uuid").GetString() ?? string.Empty,
+                Name = countriesArray.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
+                Continent = countriesArray.GetProperty("continents")[0].GetString() ?? string.Empty,
+                SyncLevel = SyncLevel.country
+            };
+
+            countries.Add(country);
+
+            await _repository.CreateBatchAsync(countries);
+
+            return country;
+        }
     }
 
     public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)

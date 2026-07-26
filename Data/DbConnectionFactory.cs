@@ -1,5 +1,5 @@
 
-using System.Data;
+using System.Data.Common;
 using Microsoft.Data.SqlClient;
 
 namespace liquidlabs_assignment.Data;
@@ -14,7 +14,7 @@ public class DbConnectionFactory : IDbConnectionFactory
         _connectionString = config.GetConnectionString("DefaultConnection") ?? throw new Exception();
     }
 
-    public IDbConnection CreateConnection()
+    public DbConnection CreateConnection()
     {
         return new SqlConnection(_connectionString);
     }
