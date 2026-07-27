@@ -12,11 +12,16 @@ public class CountriesRepository : ICountriesRepository
     }
     public async Task<IEnumerable<Country>> GetAllAsync()
     {
-        var countries = new List<Country>();
+        List<Country> countries = [];
         using var conn = _dbCon.CreateConnection();
         await conn.OpenAsync();
 
-        const string query = "SELECT * FROM countries";
+        string query = $@"
+        SELECT * 
+            FROM countries 
+        WHERE 
+            sync_level = {(int)SyncLevel.all}
+        ";
 
         using var command = conn.CreateCommand();
         command.CommandText = query;
@@ -26,9 +31,49 @@ public class CountriesRepository : ICountriesRepository
         {
             countries.Add(new Country
             {
-                Uuid = reader.GetString(reader.GetOrdinal("Id")),
-                Name = reader.GetString(reader.GetOrdinal("Name")),
-                Continent = reader.GetString(reader.GetOrdinal("Continent"))
+                Uuid = reader.GetString(reader.GetOrdinal("uuid")),
+                Name = reader.GetString(reader.GetOrdinal("name")),
+                Continent = reader.GetString(reader.GetOrdinal("continent")),
+                SyncLevel = (SyncLevel)reader.GetInt32(reader.GetOrdinal("sync_level"))
+            });
+        }
+
+        return countries;
+    }
+
+    public async Task<IEnumerable<Country>> GetByContinentAsync(string continent)
+    {
+        List<Country> countries = [];
+        using var conn = _dbCon.CreateConnection();
+        await conn.OpenAsync();
+
+        string query = $@"
+        SELECT * 
+            FROM countries 
+        WHERE 
+            LOWER(continent) = @continentName AND 
+            sync_level IN ({(int)SyncLevel.continent}, {(int)SyncLevel.all})
+        ";
+
+        using var command = conn.CreateCommand();
+        command.CommandText = query;
+
+        var para = command.CreateParameter();
+        para.ParameterName = "continentName";
+        para.Value = continent.ToLower();
+
+        command.Parameters.Add(para);
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        while (reader.Read())
+        {
+            countries.Add(new Country
+            {
+                Uuid = reader.GetString(reader.GetOrdinal("uuid")),
+                Name = reader.GetString(reader.GetOrdinal("name")),
+                Continent = reader.GetString(reader.GetOrdinal("continent")),
+                SyncLevel = (SyncLevel)reader.GetInt32(reader.GetOrdinal("sync_level"))
             });
         }
 
@@ -114,4 +159,46 @@ public class CountriesRepository : ICountriesRepository
 
         return await command.ExecuteNonQueryAsync();
     }
+
+    public async Task<bool> DeleteByContinentAsync(string continent)
+    {
+        using var conn = _dbCon.CreateConnection();
+        await conn.OpenAsync();
+
+        string query = $@"
+            DELETE 
+                FROM countries 
+            WHERE 
+                LOWER(continent) = @continentName AND
+                sync_level = {(int)SyncLevel.country}
+        ";
+
+        using var command = conn.CreateCommand();
+        command.CommandText = query;
+
+        var para1 = command.CreateParameter();
+        para1.ParameterName = "continentName";
+        para1.Value = continent.ToLower();
+        command.Parameters.Add(para1);
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAllAsync()
+    {
+        using var conn = _dbCon.CreateConnection();
+        await conn.OpenAsync();
+
+        const string query = "DELETE FROM countries";
+
+        using var command = conn.CreateCommand();
+        command.CommandText = query;
+
+        using var reader = await command.ExecuteReaderAsync();
+
+        return true;
+    }
+
 }

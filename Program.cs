@@ -1,4 +1,5 @@
 using liquidlabs_assignment.Data;
+using liquidlabs_assignment.Middleware;
 using liquidlabs_assignment.Models;
 using liquidlabs_assignment.Repositories;
 using liquidlabs_assignment.Services;
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // configurations
+builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.Configure<ExternalApiConfig>(builder.Configuration.GetSection("ExternalApi"));
 builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =>
@@ -20,7 +23,6 @@ builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =
 
 // custom services
 builder.Services.AddScoped<ICountriesService, CountriesService>();
-builder.Services.AddScoped<IExternalApiService, ExternalApiService>();
 
 // repositories
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
@@ -34,9 +36,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseExceptionHandler();
+app.UseStatusCodePages(async context =>
+{
+    context.HttpContext.Response.ContentType = "application/json";
+    await context.HttpContext.Response.WriteAsJsonAsync(new ErrorResponse
+    {
+        status = "failed",
+        error = $"Endpoint Not Found ({context.HttpContext.Response.StatusCode})",
+        details = $"The route {context.HttpContext.Request.Path} doesn't exist"
+    });
+});
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
