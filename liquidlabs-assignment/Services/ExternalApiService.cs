@@ -15,7 +15,7 @@ public class ExternalApiService : IExternalApiService
         _apiConfig = apiConfig.Value;
     }
 
-    public async Task<JsonElement> GetAllFromApiAsync(string? name, string? continent)
+    public async Task<List<Country>> GetAllFromApiAsync(string? name, string? continent)
     {
         string endpoint;
 
@@ -29,9 +29,24 @@ public class ExternalApiService : IExternalApiService
         else
             throw new Exception();
 
-        _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiConfig.ApiKey}");
+
         var data = await _client.GetFromJsonAsync<JsonElement>(endpoint);
-        return data;
+        JsonElement countriesArray = data.GetProperty("data").GetProperty("objects"); // countries list is under data > objects > list
+
+        List<Country> countries = [];
+
+        foreach (JsonElement obj in countriesArray.EnumerateArray())
+        {
+            countries.Add(new Country
+            {
+                Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
+                Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
+                Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
+                SyncLevel = SyncLevel.all
+            });
+        }
+
+        return countries;
     }
 
 }

@@ -7,5 +7,5 @@ public interface ICountriesService
 {
     Task<IEnumerable<Country>> GetAllAsync();
     Task<IEnumerable<Country>> GetByContinentAsync(string continent);
-    Task<Country?> GetByNameAsync(string name);
+    Task<Country?> GetByCountryAsync(string name);
 }

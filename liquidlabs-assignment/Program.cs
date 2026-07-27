@@ -1,8 +1,10 @@
+using System.Net.Http.Headers;
 using liquidlabs_assignment.Data;
 using liquidlabs_assignment.Middleware;
 using liquidlabs_assignment.Models;
 using liquidlabs_assignment.Repositories;
 using liquidlabs_assignment.Services;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +18,12 @@ builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 builder.Services.Configure<ExternalApiConfig>(builder.Configuration.GetSection("ExternalApi"));
-builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>(client =>
+builder.Services.AddHttpClient<IExternalApiService, ExternalApiService>((sp, client) =>
 {
+    var apiConfig = sp.GetRequiredService<IOptions<ExternalApiConfig>>().Value;
+
     client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiConfig.ApiKey);
 });
 
 // custom services

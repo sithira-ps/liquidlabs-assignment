@@ -80,7 +80,7 @@ public class CountriesRepository : ICountriesRepository
         return countries;
     }
 
-    public async Task<Country?> GetByNameAsync(string name)
+    public async Task<Country?> GetByCountryAsync(string name)
     {
         Country? country = null;
         using var conn = _dbCon.CreateConnection();
