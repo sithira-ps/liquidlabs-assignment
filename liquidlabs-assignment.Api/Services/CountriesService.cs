@@ -22,7 +22,7 @@ public class CountriesService : ICountriesService
 
         var dbData = await _repository.GetAllAsync();
 
-        if (dbData.Count() != 0 && dbData != null)
+        if (dbData != null && dbData.Count() != 0)
         {
             return dbData;
         }
@@ -57,9 +57,9 @@ public class CountriesService : ICountriesService
 
         var dbData = await _repository.GetByContinentAsync(continent);
 
-        if (dbData.Count() != 0 && dbData != null)
+        if (dbData != null && dbData.Count() != 0)
         {
-            return dbData!;
+            return dbData;
         }
         else
         {
@@ -71,7 +71,7 @@ public class CountriesService : ICountriesService
                 {
                     Uuid = obj.GetProperty("uuid").GetString() ?? string.Empty,
                     Name = obj.GetProperty("names").GetProperty("common").GetString() ?? string.Empty,
-                    Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty,
+                    Continent = obj.GetProperty("continents")[0].GetString() ?? string.Empty, // get only the first continent name from the array : the api gives an array of continents per country.
                     SyncLevel = SyncLevel.continent
                 });
             }
@@ -86,9 +86,9 @@ public class CountriesService : ICountriesService
         return countries;
     }
 
-    public async Task<Country?> GetByNameAsync(string name)
+    public async Task<Country?> GetByCountryAsync(string name)
     {
-        var dbData = await _repository.GetByNameAsync(name);
+        var dbData = await _repository.GetByCountryAsync(name);
 
         if (dbData != null)
         {

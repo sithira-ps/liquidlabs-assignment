@@ -28,9 +28,9 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet("{name}")]
-    public async Task<SuccessResponse<IEnumerable<Country>>> GetByNameAsync(string name)
+    public async Task<SuccessResponse<IEnumerable<Country>>> GetByCountryAsync(string name)
     {
-        Country? result = await _countriesService.GetByNameAsync(name);
+        Country? result = await _countriesService.GetByCountryAsync(name);
         var response = new SuccessResponse<IEnumerable<Country>>
         {
             status = "success",

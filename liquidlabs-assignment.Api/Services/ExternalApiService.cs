@@ -29,7 +29,6 @@ public class ExternalApiService : IExternalApiService
         else
             throw new Exception();
 
-        _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiConfig.ApiKey}");
         var data = await _client.GetFromJsonAsync<JsonElement>(endpoint);
         return data;
     }
