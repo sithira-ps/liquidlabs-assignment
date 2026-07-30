@@ -1,6 +1,5 @@
 using liquidlabs_assignment.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.OpenApi.Any;
 
 namespace liquidlabs_assignment.Middleware;
 
@@ -21,9 +20,11 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
         await context.Response.WriteAsJsonAsync(new ErrorResponse
         {
             status = "failed",
-            error = exception.Message,
-            details = exception.InnerException?.Message,
+            error = "An unexpected error occurred.",
+            details = "Please contact the administrators."
         }, ct);
+
+        _logger.LogError(exception, "An unexpected error occurred");
 
         return true;
     }
