@@ -1,6 +1,21 @@
-CREATE TABLE countries (
-	uuid VARCHAR(50) UNIQUE NOT NULL,
-	name VARCHAR(100) NOT NULL,
-	continent VARCHAR(100),
-	sync_level INT NOT NULL
-)
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'liquidlabs-assignment')
+BEGIN
+    CREATE DATABASE [liquidlabs-assignment];
+END
+GO
+
+USE [liquidlabs-assignment];
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'countries')
+BEGIN
+
+	CREATE TABLE [liquidlabs-assignment].dbo.countries (
+		uuid varchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS PRIMARY KEY,
+		name varchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+		continent varchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+		sync_level int NOT NULL
+	);
+	
+END
+GO
